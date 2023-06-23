@@ -2,6 +2,7 @@ package pe.edu.pucp.tel131lab9.dao;
 
 import pe.edu.pucp.tel131lab9.bean.Employee;
 import pe.edu.pucp.tel131lab9.bean.Post;
+import pe.edu.pucp.tel131lab9.dto.CantidadComentariosDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -67,6 +68,10 @@ public class PostDao extends DaoBase{
         post.setTitle(rs.getString(2));
         post.setContent(rs.getString(3));
         post.setEmployeeId(rs.getInt(4));
+        post.setDatetime(rs.getTimestamp(5));
+
+        int cantidad = obtenerCantidadComentarios(rs.getInt(1));
+        post.setCantidad(cantidad);
 
         Employee employee = new Employee();
         employee.setEmployeeId(rs.getInt("e.employee_id"));
@@ -75,4 +80,67 @@ public class PostDao extends DaoBase{
         post.setEmployee(employee);
     }
 
+    public ArrayList<Post> buscarPorPost(String name) {
+        ArrayList<Post> listabusqueda = new ArrayList<>();
+
+        String sql = "SELECT * FROM post p\n" +
+                "inner join employees e on p.employee_id = e.employee_id\n" +
+                "where (p.title like ?) or (p.content like ?) or (e.first_name like ?) or (e.last_name like ?) ;";
+
+        try (Connection connection = this.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1,  "%" + name + "%");
+            preparedStatement.setString(2,  "%" + name + "%");
+            preparedStatement.setString(3,  "%" + name + "%");
+            preparedStatement.setString(4,  "%" + name + "%");
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    Post post = new Post();
+                    post.setTitle(rs.getString(2));
+                    post.setContent(rs.getString(3));
+                    post.setDatetime(rs.getTimestamp(5));
+
+                    Employee employee = new Employee();
+                    employee.setFirstName(rs.getString(7));
+                    employee.setLastName(rs.getString(8));
+                    post.setEmployee(employee);
+
+                    int cantidad = obtenerCantidadComentarios(rs.getInt(1));
+                    post.setCantidad(cantidad);
+                    listabusqueda.add(post);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return listabusqueda;
+    }
+
+
+    public int obtenerCantidadComentarios(int idPost) {
+
+        CantidadComentariosDTO cantidadComentarios = new CantidadComentariosDTO();
+
+        String sql = "SELECT post_id, count(*) as cantidad FROM lab9.comments c\n" +
+                "where post_id = ?\n" +
+                "group by post_id ;";
+
+        try (Connection connection = this.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, idPost);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    cantidadComentarios.setCantidad(rs.getInt(2));
+                }
+                return cantidadComentarios.getCantidad();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

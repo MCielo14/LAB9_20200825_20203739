@@ -1,7 +1,11 @@
 <%@page import="java.util.ArrayList" %>
 <%@ page import="pe.edu.pucp.tel131lab9.bean.Post" %>
+
 <jsp:useBean id="posts" type="java.util.ArrayList<pe.edu.pucp.tel131lab9.bean.Post>" scope="request"/>
+
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,10 +22,17 @@
         <div class="col-md-7">
             <h1>Home</h1>
         </div>
+      
         <div class="col-md-5 col-lg-4 ms-auto my-auto text-md-end">
             <a href="<%= request.getContextPath()%>/PostServlet?action=new" class="btn btn-primary">New Post</a>
         </div>
+
     </div>
+    <form method="post" action="<%=request.getContextPath()%>/HomeServlet?p=buscar">
+        <input type="text" placeholder="¿Qué juego estás buscando?" name="textoBuscar" aria-label="textoBuscar"
+               onkeypress="handle" />
+        <button role="button">Buscar</button>
+    </form>
     <div class="row">
         <%for (Post p : posts) {%>
         <div class="col-sm-4 py-3">
@@ -29,7 +40,9 @@
                 <div class="card-body">
                     <h5 class="card-title"><%= p.getTitle()%></h5>
                     <h6 class="card-subtitle mb-2 text-muted"><%= p.getEmployee().getFirstName() + p.getEmployee().getLastName()%></h6>
-                    <p class="card-text"><%= p.getContent()%></p>
+                    <h5 class="card-title"><%= p.getDatetime()%></h5>
+                    <h6 class="card-text"><%= p.getContent()%></h6>
+                    <h6 class="card-text"><%= p.getCantidad()%> comments</h6>
                     <a href="<%= request.getContextPath()%>/PostServlet?action=view&id=<%=p.getPostId()%>" class="btn btn-primary">View</a>
                 </div>
             </div>

@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import pe.edu.pucp.tel131lab9.dao.CommentDao;
 import pe.edu.pucp.tel131lab9.dao.PostDao;
 
@@ -17,9 +18,12 @@ public class PostServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action") != null ? req.getParameter("action") : "";
 
-        if (action.equals("comment")) {
+        //if (action.equals("nuevoPost")) {
 
-        }
+        //} else if (action.equals((""))) {
+          //  resp.sendRedirect(req.getContextPath() + "/PostServlet");
+            
+        //}
     }
 
     @Override
@@ -28,7 +32,8 @@ public class PostServlet extends HttpServlet {
         String action = req.getParameter("action") != null ? req.getParameter("action") : "";
 
         if (action.equals("new")) {
-            // TODO
+            view = req.getRequestDispatcher("/post/newPost.jsp");
+            view.forward(req, resp);
         }
         else if (action.equals("view")) {
             String id = req.getParameter("id") != null ? req.getParameter("id") : "";
@@ -40,6 +45,7 @@ public class PostServlet extends HttpServlet {
             view = req.getRequestDispatcher("post/viewPost.jsp");
             view.forward(req, resp);
         }
+
 
     }
 }
